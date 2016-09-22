@@ -198,9 +198,9 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:layout_weight="1"
-            android:text="0"
+            android:text="."
             android:textSize="8pt"
-            android:id="@+id/btn0"
+            android:id="@+id/btnComma"
             android:layout_marginLeft="1dp"
             android:layout_marginRight="1dp">
         </Button>
@@ -208,9 +208,9 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:layout_weight="1"
-            android:text=","
+            android:text="0"
             android:textSize="8pt"
-            android:id="@+id/btnComma"
+            android:id="@+id/btn0"
             android:layout_marginLeft="1dp"
             android:layout_marginRight="1dp">
         </Button>
@@ -225,6 +225,7 @@
         </Button>
     </LinearLayout>
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -236,10 +237,38 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:layout_weight="1"
+            android:text="<-"
+            android:textSize="8pt"
+            android:id="@+id/btnBcsp">
+        </Button>
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:text="("
+            android:textSize="8pt"
+            android:id="@+id/btnOpenBr">
+        </Button>
+
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:text=")"
+            android:textSize="8pt"
+            android:id="@+id/btnCloseBr">
+        </Button>
+
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
             android:text="="
             android:textSize="8pt"
             android:id="@+id/btnEq">
         </Button>
+
+
     </LinearLayout>
 
 </LinearLayout>

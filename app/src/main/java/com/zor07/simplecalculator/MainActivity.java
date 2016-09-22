@@ -4,9 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -17,25 +15,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button btnEquals;
     Button btnComma;
     Button btnClear;
+    Button btnOpenBr, btnCloseBr, btnBcsp;
     Button[] btnsNumber = new Button[10];
 
+    TextView tvExpression;
     TextView tvResult;
-    TextView tvInfo;
 
     char selectedAction = ' '; // +, -, /, или *
-    Operation operation;
     double currentResult = 0;
-    double displayValue = 0;
-    double eqN1 = 0, eqN2 = 0;
-    boolean newNumber, eqInitialized, firstSubOperation = true;
+    String expression;
+    boolean eqInitialized, newNumber;
 
-    enum Operation{
-        ADD,
-        SUB,
-        DIV,
-        MULT,
-        NULL
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,9 +38,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnClear = (Button) findViewById(R.id.btnClear);
         btnComma = (Button) findViewById(R.id.btnComma);
         btnEquals = (Button) findViewById(R.id.btnEq);
+        btnOpenBr = (Button) findViewById(R.id.btnOpenBr);
+        btnCloseBr = (Button) findViewById(R.id.btnCloseBr);
+        btnBcsp = (Button) findViewById(R.id.btnBcsp);
 
-        tvResult = (TextView) findViewById(R.id.tvResult);
-        tvInfo = (TextView) findViewById(R.id.tvInfo);
+        tvExpression = (TextView) findViewById(R.id.tvResult);
+        tvResult = (TextView) findViewById(R.id.tvInfo);
 
         btnsNumber[0] = (Button) findViewById(R.id.btn0);
         btnsNumber[1] = (Button) findViewById(R.id.btn1);
@@ -81,13 +74,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        String displayText = tvResult.getText().toString();
-
-        if (!"".equals(displayText)){
-            displayValue = Double.parseDouble(displayText.replace(",", "."));
-        }
+        String displayText = tvExpression.getText().toString();
 
         switch (v.getId()) {
+            /*
             case R.id.btnAdd:
                 //if (!replaceActionSymbol(displayText, '+'))
                 add();
@@ -104,15 +94,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //if (!replaceActionSymbol(displayText, '/'))
                 div();
                 break;
+            */
+
             case R.id.btnClear:
                 clear();
                 break;
             case R.id.btnComma:
-                addComma(displayText);
+                addComma();
                 break;
+
             case R.id.btnEq:
-                equal(operation);
+                equal();
                 break;
+
             default:
                 //Для цифр дописываем нажатую цифру в дисплей
                 if (eqInitialized) clear();
@@ -125,130 +119,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         newNumber = false;
                     } else
                         displayText += btnText;
-                    tvResult.setText(displayText);
+                    tvExpression.setText(displayText);
                 }
                 break;
         }
     }
     public boolean replaceActionSymbol(String displayText, char symbol){
         if ("".equals(displayText)){
-            String currentInfoText = tvInfo.getText().toString();
+            String currentInfoText = tvResult.getText().toString();
             int len = currentInfoText.length();
             String newInfoText = currentInfoText.replace(currentInfoText.charAt(len - 1), symbol);
-            tvInfo.setText(newInfoText);
+            tvResult.setText(newInfoText);
             return true;
         } else
             return false;
     }
-    public void add(){
-        firstSubOperation = true;
-        selectedAction = '+';
-        operation = operation.ADD;
-        if (eqInitialized)
-            currentResult = displayValue;
-        else
-            currentResult += displayValue;
-        tvInfo.setText(currentResult + "+");
-        tvResult.setText("");
-        displayValue = 0;
-        eqInitialized = false;
-    }
-    public void sub(){
 
-        selectedAction = '-';
-        operation = operation.SUB;
-        if (!eqInitialized)
-            if (!firstSubOperation) {
-                currentResult -= displayValue;
+    public void equal(){}
 
-            }
-            else {
-                firstSubOperation = false;
-                currentResult = displayValue;
-            }
-        else
-            currentResult = displayValue;
-        tvInfo.setText(currentResult + "-");
-        tvResult.setText("");
-        displayValue = 0;
-        eqInitialized = false;
-
-    }
-    public void div(){
-        firstSubOperation = true;
-        selectedAction = '/';
-        operation = operation.DIV;
-        if (eqInitialized)
-            currentResult = displayValue;
-        else
-            currentResult /= displayValue;
-        tvInfo.setText(currentResult + "/");
-        tvResult.setText("");
-        displayValue = 0;
-        eqInitialized = false;
-    }
-    public void mult() {
-        firstSubOperation = true;
-        selectedAction = '*';
-        operation = operation.MULT;
-        if (eqInitialized)
-            currentResult = displayValue;
-        else
-            currentResult *= displayValue;
-        tvInfo.setText(currentResult + "*");
-        tvResult.setText("");
-        displayValue = 0;
-        eqInitialized = false;
-
-    }
-    public void equal(Operation operation){
-        if (!eqInitialized) {
-            eqN1 = currentResult;
-            eqN2 = displayValue;
-            eqInitialized = true;
-        }
-        switch (operation.ordinal()){
-            case (0): //ADD
-                currentResult = eqN1 + eqN2;
-                break;
-            case (1): //SUB
-                currentResult = eqN1 - eqN2;
-                break;
-            case (2): //DIV
-                try {
-                    if (displayValue == 0) throw new ArithmeticException();
-                    currentResult = eqN1 / eqN2;
-                } catch (ArithmeticException e){
-                    clear();
-                    Toast.makeText(this, "Деление на ноль!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                break;
-            case (3): //MULT
-                currentResult = eqN1 * eqN2;
-                break;
-        }
-        tvInfo.setText(String.valueOf(eqN1) +  selectedAction + String.valueOf(eqN2));
-        tvResult.setText(""+currentResult);
-        newNumber = true;
-    }
     public void clear(){
-        firstSubOperation = true;
-        eqN1 = 0;
-        eqN2 = 0;
-        displayValue = 0;
-        currentResult = 0;
-        operation = Operation.NULL;
-        tvInfo.setText("");
+        expression = "";
         tvResult.setText("");
+        tvExpression.setText("");
     }
-    public void addComma(String displayText){
+    public void addComma(){
+        String displayText = "";
+
         if (!displayText.contains(".")){
             if (displayText.length() == 0){
                 displayText += "0.";
             } else {
                 displayText += ".";
             }
-            tvResult.setText(displayText);
+            tvExpression.setText(displayText);
         }}
 }
