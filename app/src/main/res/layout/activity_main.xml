@@ -237,9 +237,10 @@
             android:layout_height="wrap_content"
             android:layout_width="match_parent"
             android:layout_weight="1"
-            android:text="<-"
+            android:text="bcsp"
             android:textSize="8pt"
-            android:id="@+id/btnBcsp">
+            android:id="@+id/btnBcsp"
+            android:layout_marginRight="1dp">
         </Button>
         <Button
             android:layout_height="wrap_content"
@@ -247,7 +248,9 @@
             android:layout_weight="1"
             android:text="("
             android:textSize="8pt"
-            android:id="@+id/btnOpenBr">
+            android:id="@+id/btnOpenBr"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp">
         </Button>
 
         <Button
@@ -256,7 +259,9 @@
             android:layout_weight="1"
             android:text=")"
             android:textSize="8pt"
-            android:id="@+id/btnCloseBr">
+            android:id="@+id/btnCloseBr"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="1dp">
         </Button>
 
         <Button
@@ -265,7 +270,8 @@
             android:layout_weight="1"
             android:text="="
             android:textSize="8pt"
-            android:id="@+id/btnEq">
+            android:id="@+id/btnEq"
+            android:layout_marginLeft="1dp">
         </Button>
 
 

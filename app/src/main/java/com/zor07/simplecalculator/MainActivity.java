@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     char selectedAction = ' '; // +, -, /, или *
     double currentResult = 0;
+
     String expression;
     boolean eqInitialized, newNumber;
 
@@ -61,6 +62,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnComma.setOnClickListener(this);
         btnEquals.setOnClickListener(this);
 
+
+        btnOpenBr.setOnClickListener(this);
+        btnCloseBr.setOnClickListener(this);
+        btnBcsp.setOnClickListener(this);
         btnAdd.setOnClickListener(this);
         btnSub.setOnClickListener(this);
         btnSub.setOnClickListener(this);
@@ -74,27 +79,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        String displayText = tvExpression.getText().toString();
+        expression = tvExpression.getText().toString();
 
         switch (v.getId()) {
-            /*
+
             case R.id.btnAdd:
-                //if (!replaceActionSymbol(displayText, '+'))
-                add();
+                addActionSymbol('+');
                 break;
             case R.id.btnSub:
-                //if (!replaceActionSymbol(displayText, '-'))
-                sub();
+                addActionSymbol('-');
                 break;
             case R.id.btnMult:
-                //if (!replaceActionSymbol(displayText, '*'))
-                mult();
+                addActionSymbol('*');
                 break;
             case R.id.btnDiv:
-                //if (!replaceActionSymbol(displayText, '/'))
-                div();
+                addActionSymbol('/');
                 break;
-            */
+
+            case R.id.btnOpenBr:
+                break;
+
+            case R.id.btnCloseBr:
+                break;
+
 
             case R.id.btnClear:
                 clear();
@@ -107,32 +114,61 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 equal();
                 break;
 
+            case R.id.btnBcsp:
+                if (expression.length() > 0) {
+                    expression = expression.substring(0, expression.length() - 1);
+                    tvExpression.setText(expression);
+                }
+                break;
+
             default:
                 //Для цифр дописываем нажатую цифру в дисплей
-                if (eqInitialized) clear();
-                eqInitialized = false;
-                if (displayText.length() < 30) {
+                if (expression.length() < 30) {
                     Button btn = (Button) v;
                     String btnText = btn.getText().toString();
-                    if (newNumber){
-                        displayText = btnText;
-                        newNumber = false;
-                    } else
-                        displayText += btnText;
-                    tvExpression.setText(displayText);
+                    expression += btnText;
+
+                    tvExpression.setText(expression);
                 }
                 break;
         }
     }
-    public boolean replaceActionSymbol(String displayText, char symbol){
-        if ("".equals(displayText)){
-            String currentInfoText = tvResult.getText().toString();
-            int len = currentInfoText.length();
-            String newInfoText = currentInfoText.replace(currentInfoText.charAt(len - 1), symbol);
-            tvResult.setText(newInfoText);
-            return true;
-        } else
-            return false;
+
+    /**
+     * Добавляет открывающуюся скобку в выражение
+     * возможные случаи:
+     * Скобка ставится после цифры, тогда функция ставит перед скобкой знак умножения;
+     * Скобка ставится во всех остальных случаях;
+     */
+    public void addOpenBr(){
+
+    }
+
+    public void addActionSymbol(char action){
+        switch (action) {
+            case '-':
+                if (atTheStart()){
+                    changeAction(action);
+                } else {
+                    expression = "-";
+                    tvExpression.setText(expression);
+                }
+                break;
+            default:
+                if (atTheStart()){
+                    changeAction(action);
+                }
+                break;
+        }
+    }
+
+    public void changeAction(char action){
+        char lastExprCh = expression.charAt(expression.length()-1);
+        if (lastExprCh == '+' || lastExprCh == '-' || lastExprCh == '*' || lastExprCh == '/')
+            expression = expression.substring(0, expression.length() - 1);
+        expression += action;
+
+        tvExpression.setText(expression);
     }
 
     public void equal(){}
@@ -152,5 +188,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 displayText += ".";
             }
             tvExpression.setText(displayText);
-        }}
+        }
+    }
+
+    public boolean atTheStart(){
+        return expression.length() == 0;
+    }
 }
