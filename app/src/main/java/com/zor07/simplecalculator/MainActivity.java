@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.util.regex.Pattern;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     Button btnAdd;
@@ -21,11 +23,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     TextView tvExpression;
     TextView tvResult;
 
-    char selectedAction = ' '; // +, -, /, или *
-    double currentResult = 0;
-
     String expression;
-    boolean eqInitialized, newNumber;
+    int openedBrCount, closedBrCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,12 +96,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btnOpenBr:
+                addOpenBr();
                 break;
 
             case R.id.btnCloseBr:
+                addCloseBr();
                 break;
-
-
             case R.id.btnClear:
                 clear();
                 break;
@@ -115,9 +114,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
 
             case R.id.btnBcsp:
-                if (expression.length() > 0) {
-                    expression = expression.substring(0, expression.length() - 1);
-                    tvExpression.setText(expression);
+                if (!atTheStart()) {
+                    deleteLastCharFromExpression();
                 }
                 break;
 
@@ -128,52 +126,109 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     String btnText = btn.getText().toString();
                     expression += btnText;
 
-                    tvExpression.setText(expression);
                 }
                 break;
         }
-    }
-
-    /**
-     * Добавляет открывающуюся скобку в выражение
-     * возможные случаи:
-     * Скобка ставится после цифры, тогда функция ставит перед скобкой знак умножения;
-     * Скобка ставится во всех остальных случаях;
-     */
-    public void addOpenBr(){
-
-    }
-
-    public void addActionSymbol(char action){
-        switch (action) {
-            case '-':
-                if (atTheStart()){
-                    changeAction(action);
-                } else {
-                    expression = "-";
-                    tvExpression.setText(expression);
-                }
-                break;
-            default:
-                if (atTheStart()){
-                    changeAction(action);
-                }
-                break;
-        }
-    }
-
-    public void changeAction(char action){
-        char lastExprCh = expression.charAt(expression.length()-1);
-        if (lastExprCh == '+' || lastExprCh == '-' || lastExprCh == '*' || lastExprCh == '/')
-            expression = expression.substring(0, expression.length() - 1);
-        expression += action;
 
         tvExpression.setText(expression);
     }
 
+    /**
+     * Добавляет открывающую скобку в expression
+     * возможные случаи:
+     * Скобка ставится после цифры, тогда функция ставит перед скобкой знак умножения;
+     * Скобка ставится во всех остальных случаях;
+     *
+     * Увеличивает счетчик открытых скобок на 1
+     */
+    public void addOpenBr(){
+        if (Pattern.matches(".*[\\d\\(]", expression)){
+            expression += "*(";
+        } else
+            expression += "(";
+
+        openedBrCount ++;
+    }
+
+
+    /**
+     * Добавляет закрывающую скобку в expression
+     * в случае если закрывающих скобок меньше чем открывающих
+     */
+    public void addCloseBr(){
+        if (openedBrCount > closedBrCount){
+            if (Pattern.matches(".*[\\d.]", expression)){
+                //закрывающая скобка после числа или точки
+                expression += ")";
+                closedBrCount ++;
+            }
+        }
+    }
+
+    /**
+     * Обработка нажатия кнопки Минус
+     */
+    private void addMinus(){
+        if (atTheStart()) {
+            expression = "-";
+        } else if (Pattern.matches(".*[*/]", expression)){
+            //минус после знака умножения или деления
+            expression += "(-";
+            openedBrCount ++;
+        } else if (Pattern.matches(".*[+.]", expression)){
+            //минус после знака плюса или точки
+            deleteLastCharFromExpression();
+            expression += "-";
+        } else if (Pattern.matches(".*[\\d\\(]", expression)){
+            //минус после цифры или открывающей скобки
+            expression += "-";
+        }
+    }
+
+    /**
+     * Добавляет знак действия в строковое выражение expression
+     * @param action знак действия, '+' | '-' | '*' | '/'
+     */
+
+    public void addActionSymbol(char action){
+        switch (action) {
+            case '-':
+                //обработка -
+                addMinus();
+                break;
+            default:
+                //обработка +,*,/
+                if (Pattern.matches(".*[\\d.\\)]", expression)){
+                    //знак действия после числа или точки или закрывающей скобки
+                    expression += action;
+
+                } else if (Pattern.matches(".*[\\(]", expression)){
+                    //знак действия после открывающей скобки
+                    //ничего не делаем
+
+                } else if (Pattern.matches(".*\\(-", expression)){
+                    //знак действия после "(-"
+                    deleteLastCharFromExpression();
+
+                } else if (Pattern.matches("-", expression)){
+                    //знак действия после минуса, при условии что expression == "-"
+                    deleteLastCharFromExpression();
+
+                } else if (Pattern.matches(".*(\\d|.)[+\\-*/]", expression)) {
+                    //знак действия после другого знака, следующего за числом или точкой
+                    deleteLastCharFromExpression();
+                    expression += action;
+                }
+                break;
+        }
+    }
+
     public void equal(){}
 
+
     public void clear(){
+        openedBrCount = 0;
+        closedBrCount = 0;
         expression = "";
         tvResult.setText("");
         tvExpression.setText("");
@@ -191,7 +246,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public boolean atTheStart(){
+    /**
+     * Функция проверяет находится ли курсор в начале строки
+     * @return true если expression = "" иначе false
+     */
+    private boolean atTheStart(){
         return expression.length() == 0;
+    }
+
+    /**
+     * Удаляем последний символ expression
+     */
+    private void deleteLastCharFromExpression(){
+        if (expression == null || expression.length() == 0) {
+            return;
+        } else
+            expression =  expression.substring(0, expression.length()-1);
     }
 }
