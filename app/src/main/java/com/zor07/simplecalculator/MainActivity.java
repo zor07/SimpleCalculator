@@ -121,16 +121,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             default:
                 //Для цифр дописываем нажатую цифру в дисплей
-                if (expression.length() < 30) {
-                    Button btn = (Button) v;
-                    String btnText = btn.getText().toString();
-                    expression += btnText;
-
-                }
+                addNumber(v);
                 break;
         }
 
         tvExpression.setText(expression);
+    }
+
+    /**
+     * Обрабатывает нажатие цифры.
+     * @param v View, нажатая кнопка
+     */
+    public void addNumber(View v){
+        if (expression.length() < 30) {
+            Button btn = (Button) v;
+            String btnText = btn.getText().toString();
+            if (Pattern.matches(".*\\)", expression))
+                expression += "*" + btnText;
+            else
+                expression += btnText;
+        }
     }
 
     /**
@@ -225,7 +235,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void equal(){}
 
-
+    /**
+     * Обрабатывает нажатие кнопки "C"
+     * Сбрасывает значения всех TextView, expression, счетчиков открытых и закрытых скобок
+     */
     public void clear(){
         openedBrCount = 0;
         closedBrCount = 0;
