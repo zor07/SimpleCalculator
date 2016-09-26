@@ -1,6 +1,7 @@
 package com.zor07.simplecalculator;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.*;
 
 /**
@@ -180,7 +181,7 @@ public class ExpressionUtils {
                 if (token.equals("*")) {
                     stack.push(operand1.multiply(operand2));
                 } else if (token.equals("/")) {
-                    stack.push(operand1.divide(operand2));
+                    stack.push(operand1.divide(operand2, MathContext.DECIMAL32));
                 } else if (token.equals("+")) {
                     stack.push(operand1.add(operand2));
                 } else if (token.equals("-")) {
