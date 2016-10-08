@@ -6,9 +6,7 @@ import android.widget.Button;
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
 
-/**
- * Created by anzor on 24.09.2016.
- */
+
 public class ExpressionBuilding {
     /**
      * Определяет создание нового выражения,
@@ -56,13 +54,14 @@ public class ExpressionBuilding {
     /**
      * Добавляет открывающую скобку в expression
      * возможные случаи:
-     * Скобка ставится после цифры, тогда функция ставит перед скобкой знак умножения;
+     * Скобка ставится после цифры или закрывающей скобки
+     * тогда функция ставит перед скобкой знак умножения;
      * Скобка ставится во всех остальных случаях;
      *
      * Увеличивает счетчик открытых скобок на 1
      */
     public static void addOpenBr(){
-        if (Pattern.matches(".*[\\d\\(]", expression)){
+        if (Pattern.matches(".*[\\d\\)]", expression)){
             expression += "*(";
         } else
             expression += "(";
@@ -125,8 +124,9 @@ public class ExpressionBuilding {
      */
     public static String equal(){
         try {
-            result = ExpressionUtils.calculateExpression(expression);
+            result = ExpressionCalculation.calculate(expression);
             isNewExpression = true;
+            if (result == null) return "Ошибка";
         } catch (Exception e){
             return "Ошибка";
         }
@@ -222,8 +222,8 @@ public class ExpressionBuilding {
             //минус после знака плюса или точки
             deleteLastCharFromExpression();
             expression += "-";
-        } else if (Pattern.matches(".*[\\d\\(]", expression)){
-            //минус после цифры или открывающей скобки
+        } else if (Pattern.matches(".*[\\d\\()]", expression)){
+            //минус после цифры открывающей или закрывающей скобки
             expression += "-";
         }
     }
