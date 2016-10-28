@@ -22,4 +22,5 @@
     <string name="bcsp">bcsp</string>
     <string name="openBr">(</string>
     <string name="closeBr">)</string>
+    <string name="percent">%</string>
 </resources>

@@ -31,9 +31,22 @@ public class ExpressionBuilding {
     private static BigDecimal result;
 
     /**
+     * Значения размеров текста в TextView
+     */
+    private static int textViewExpressionSize, textViewResultSize;
+
+    /**
      * Закрытый конструктор класса.
      */
     private ExpressionBuilding() {
+    }
+
+    public static BigDecimal getResult() {
+        return result;
+    }
+
+    public static void setResult(BigDecimal result) {
+        ExpressionBuilding.result = result;
     }
 
     /**
@@ -41,27 +54,37 @@ public class ExpressionBuilding {
      * @param v View, нажатая кнопка
      */
     public static void addNumber(View v){
-        if (expression.length() < 30) {
             Button btn = (Button) v;
             String btnText = btn.getText().toString();
-            if (Pattern.matches(".*\\)", expression))
+
+            //Обработка клавищи 0
+            //Без этой проверки позволяет набирать числа в формате 00000012 (ведущие нули)
+            //А также позволяет записывать в выражение ноль с унарным минусом
+            //Исключаем такую возможность
+            if ((Pattern.matches("^-?0?$", expression)
+                    || Pattern.matches(".*[+\\-*/]0", expression)
+                    || Pattern.matches(".*\\(-", expression))
+                    && btnText.equals("0")) {
+                deleteLastCharFromExpression();
+            }
+
+            if (Pattern.matches(".*[\\)%]", expression))
                 expression += "*" + btnText;
             else
                 expression += btnText;
-        }
     }
 
     /**
      * Добавляет открывающую скобку в expression
      * возможные случаи:
-     * Скобка ставится после цифры или закрывающей скобки
+     * Скобка ставится после цифры или закрывающей скобки или процента
      * тогда функция ставит перед скобкой знак умножения;
      * Скобка ставится во всех остальных случаях;
      *
      * Увеличивает счетчик открытых скобок на 1
      */
     public static void addOpenBr(){
-        if (Pattern.matches(".*[\\d\\)]", expression)){
+        if (Pattern.matches(".*[\\d\\)%]", expression)){
             expression += "*(";
         } else
             expression += "(";
@@ -75,13 +98,24 @@ public class ExpressionBuilding {
      */
     public static void addCloseBr(){
         if (openedBrCount > closedBrCount){
-            if (Pattern.matches(".*[\\d.)]", expression)){
-                //закрывающая скобка после числа или точки
+            if (Pattern.matches(".*[\\d.)%]", expression)){
+                //закрывающая скобка после числа или точки или процента
                 expression += ")";
                 closedBrCount ++;
             }
         }
     }
+
+    /**
+     * Добавляет знак процента в expression
+     */
+    public static void addPercent(){
+        if (Pattern.matches(".+[+\\-*/]\\d+$", expression)){
+            //знак процента, после числа, которому предшествует знак действия, который стоит не в начале строки
+            expression += "%";
+        }
+    }
+
 
     /**
      * Обрабатывает нажатие кнопки "C"
@@ -110,7 +144,7 @@ public class ExpressionBuilding {
      */
     public static void addComma(){
         if (Pattern.matches(".*[\\d]", expression)) {
-            String[] nums = expression.split("[()+\\-*/]");
+            String[] nums = expression.split("[()+\\-*/%]");
             String lastNum = nums[nums.length - 1];
 
             if (!lastNum.contains(".")) {
@@ -145,8 +179,8 @@ public class ExpressionBuilding {
                 break;
             default:
                 //обработка +,*,/
-                if (Pattern.matches(".*[\\d.\\)]", expression)){
-                    //знак действия после числа или точки или закрывающей скобки
+                if (Pattern.matches(".*[\\d.\\)%]", expression)){
+                    //знак действия после числа или точки или закрывающей скобки или знака процента
                     expression += action;
 
                 } else if (Pattern.matches(".*[\\(]", expression)){
@@ -222,19 +256,28 @@ public class ExpressionBuilding {
             //минус после знака плюса или точки
             deleteLastCharFromExpression();
             expression += "-";
-        } else if (Pattern.matches(".*[\\d\\()]", expression)){
-            //минус после цифры открывающей или закрывающей скобки
+        } else if (Pattern.matches(".*[\\d\\()%]", expression)){
+            //минус после цифры открывающей или закрывающей скобки или процента
             expression += "-";
         }
     }
 
     /**
      * Удаляем последний символ expression
+     *
      */
     private static void deleteLastCharFromExpression(){
         if (expression == null || expression.length() == 0) {
             return;
-        } else
-            expression =  expression.substring(0, expression.length()-1);
+        } else {
+            String lastChar = String.valueOf(expression.charAt(expression.length() - 1));
+            if (lastChar.equals("(")){
+                openedBrCount --;
+            } else if (lastChar.equals(")")){
+                closedBrCount --;
+            }
+
+            expression = expression.substring(0, expression.length() - 1);
+        }
     }
 }

@@ -19,7 +19,7 @@ android:layout_height="fill_parent">
         android:layout_width="match_parent"
         android:layout_marginLeft="5pt"
         android:layout_marginRight="5pt"
-        android:textSize="30pt"
+        android:textSize="14pt"
         android:layout_marginTop="3pt"
         android:id="@+id/tvInfo"
         android:gravity="bottom|right"
@@ -32,7 +32,7 @@ android:layout_height="fill_parent">
         android:layout_width="match_parent"
         android:layout_marginLeft="5pt"
         android:layout_marginRight="5pt"
-        android:textSize="20pt"
+        android:textSize="12pt"
         android:layout_marginTop="3pt"
         android:id="@+id/tvResult"
         android:gravity="bottom|right">
@@ -265,6 +265,16 @@ android:layout_height="fill_parent">
         android:text="@string/closeBr"
         android:textSize="8pt"
         android:id="@+id/btnCloseBr"
+        android:layout_marginLeft="1dp"
+        android:layout_marginRight="1dp">
+    </Button>
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:text="@string/percent"
+        android:textSize="8pt"
+        android:id="@+id/btnPercent"
         android:layout_marginLeft="1dp"
         android:layout_marginRight="1dp">
     </Button>

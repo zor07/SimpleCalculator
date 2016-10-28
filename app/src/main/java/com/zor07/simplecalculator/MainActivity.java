@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.math.BigDecimal;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
 
@@ -13,11 +15,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**
      * Кнопки калькулятора
      */
+    Button btnPercent;
     Button btnAdd;
     Button btnSub;
     Button btnMult;
     Button btnDiv;
     Button btnEquals;
+    Button btnEquals2;
     Button btnComma;
     Button btnClear;
     Button btnOpenBr, btnCloseBr, btnBcsp;
@@ -28,10 +32,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     TextView tvExpression;
     TextView tvResult;
-
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +46,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnClear = (Button) findViewById(R.id.btnClear);
         btnComma = (Button) findViewById(R.id.btnComma);
         btnEquals = (Button) findViewById(R.id.btnEq);
+        btnEquals2 = (Button) findViewById(R.id.btnEq2);
         btnOpenBr = (Button) findViewById(R.id.btnOpenBr);
         btnCloseBr = (Button) findViewById(R.id.btnCloseBr);
         btnBcsp = (Button) findViewById(R.id.btnBcsp);
+        btnPercent = (Button) findViewById(R.id.btnPercent);
 
         tvExpression = (TextView) findViewById(R.id.tvResult);
         tvResult = (TextView) findViewById(R.id.tvInfo);
@@ -68,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnClear.setOnClickListener(this);
         btnComma.setOnClickListener(this);
         btnEquals.setOnClickListener(this);
+        if (btnEquals2 != null)
+            btnEquals2.setOnClickListener(this);
 
 
         btnOpenBr.setOnClickListener(this);
@@ -75,9 +79,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnBcsp.setOnClickListener(this);
         btnAdd.setOnClickListener(this);
         btnSub.setOnClickListener(this);
-        btnSub.setOnClickListener(this);
         btnMult.setOnClickListener(this);
         btnDiv.setOnClickListener(this);
+        btnPercent.setOnClickListener(this);
 
         for (int i = 0; i <= 9; i++) {
             btnsNumber[i].setOnClickListener(this);
@@ -96,51 +100,83 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             switch (v.getId()) {
 
-            case R.id.btnAdd:
-                ExpressionBuilding.addActionSymbol('+');
-                break;
-            case R.id.btnSub:
-                ExpressionBuilding.addActionSymbol('-');
-                break;
-            case R.id.btnMult:
-                ExpressionBuilding.addActionSymbol('*');
-                break;
-            case R.id.btnDiv:
-                ExpressionBuilding.addActionSymbol('/');
-                break;
+                case R.id.btnAdd:
+                    ExpressionBuilding.addActionSymbol('+');
+                    break;
+                case R.id.btnSub:
+                    ExpressionBuilding.addActionSymbol('-');
+                    break;
+                case R.id.btnMult:
+                    ExpressionBuilding.addActionSymbol('*');
+                    break;
+                case R.id.btnDiv:
+                    ExpressionBuilding.addActionSymbol('/');
+                    break;
 
-            case R.id.btnOpenBr:
-                ExpressionBuilding.addOpenBr();
-                break;
+                case R.id.btnPercent:
+                    ExpressionBuilding.addPercent();
+                    break;
 
-            case R.id.btnCloseBr:
-                ExpressionBuilding.addCloseBr();
-                break;
-            case R.id.btnClear:
-                ExpressionBuilding.clear();
-                tvResult.setText("");
-                tvExpression.setText("");
-                break;
-            case R.id.btnComma:
-                ExpressionBuilding.addComma();
-                break;
+                case R.id.btnOpenBr:
+                    ExpressionBuilding.addOpenBr();
+                    break;
 
-            case R.id.btnEq:
-                String result = String.valueOf(ExpressionBuilding.equal());
-                tvResult.setText(result);
-                break;
+                case R.id.btnCloseBr:
+                    ExpressionBuilding.addCloseBr();
+                    break;
+                case R.id.btnClear:
+                    ExpressionBuilding.clear();
+                    tvResult.setText("");
+                    tvExpression.setText("");
+                    break;
+                case R.id.btnComma:
+                    ExpressionBuilding.addComma();
+                    break;
 
-            case R.id.btnBcsp:
-                ExpressionBuilding.backSpace();
-                break;
+                case R.id.btnEq:
+                    String result = String.valueOf(ExpressionBuilding.equal());
+                    tvResult.setText(result);
+                    break;
 
-            default:
-                //Для цифр дописываем нажатую цифру в дисплей
-                ExpressionBuilding.addNumber(v);
-                break;
-        }
+                case R.id.btnEq2:
+                    result = String.valueOf(ExpressionBuilding.equal());
+                    tvResult.setText(result);
+                    break;
+
+                case R.id.btnBcsp:
+                    ExpressionBuilding.backSpace();
+                    break;
+
+                default:
+                    //Для цифр дописываем нажатую цифру в дисплей
+                    ExpressionBuilding.addNumber(v);
+                    break;
+            }
 
         expression = ExpressionBuilding.getExpression();
         tvExpression.setText(expression);
     }
+
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("expression", ExpressionBuilding.getExpression());
+        if (ExpressionBuilding.getResult() != null)
+            outState.putString("result", ExpressionBuilding.getResult().toString());
+    }
+
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        String expression = savedInstanceState.getString("expression");
+        String strRes = savedInstanceState.getString("result");
+        if (strRes != null) {
+            BigDecimal result = new BigDecimal(Double.parseDouble(strRes));
+            tvResult.setText(result.toString());
+            ExpressionBuilding.setResult(result);
+        }
+
+        tvExpression.setText(expression);
+        ExpressionBuilding.setExpression(expression);
+    }
+
+
 }

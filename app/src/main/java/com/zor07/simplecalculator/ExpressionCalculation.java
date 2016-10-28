@@ -18,7 +18,8 @@ public class ExpressionCalculation {
         put("-", 1);
         put("*", 2);
         put("/", 2);
-        put("<", 3);
+        put("%", 3);
+        put("<", 4);
     }};
 
     private ExpressionCalculation() {
@@ -26,13 +27,13 @@ public class ExpressionCalculation {
 
     public static void main(String[] args) {
         System.out.println(
-                calculate(null) + "\n" +
-                calculate("(4 - 2 * (2 + 3) / 8 * (1 + 4))") + "\n" +
-                calculate("1+1+ASD") + "\n" +
-                calculate("ASDAS") + "\n" +
-                calculate("-1+(-10/(4-2*2))") + "\n" +
-                calculate("1+1.023*4") + "\n" +
-                calculate("1.000039999 + 1.000000001") + "\n"
+                calculate("100-10%")
+//                calculate("(4 - 2 * (2 + 3) / 8 * (1 + 4))") + "\n" +
+//                calculate("1+1+ASD") + "\n" +
+//                calculate("ASDAS") + "\n" +
+//                calculate("-1+(-10/(4-2*2))") + "\n" +
+//                calculate("1+1.023*4") + "\n" +
+//                calculate("1.000039999 + 1.000000001") + "\n"
         );
     }
 
@@ -202,6 +203,21 @@ public class ExpressionCalculation {
                 }
                 //Кладем обратно в стек число с обратным знаком
                 decimals.push(decimal.multiply(new BigDecimal("-1")));
+            } else if (element.equals("%")) {
+                //Текущий эллемент - процент
+                //Достаем верхний эллемент стэка, выталкивая его (decimal1)
+                //Достаем следующий эллемент стэка, НЕ выталкивая его (decimal2)
+                //вычисляем количество процентов (decimal1) от decimal2
+                //например decimal2 = 25
+                //decimal1 = 60
+                //результат вычисления (60 * 25) / 100 = 15
+                //кладем результат в стэк
+                BigDecimal decimal1 = decimals.pop();
+                BigDecimal decimal2 = decimals.peek();
+
+                BigDecimal tmpResult = decimal1.multiply(decimal2).divide(new BigDecimal(100));
+
+                decimals.push(tmpResult);
             } else {
                 // текущий эллемент - оператор, записываем его в стэк
                 BigDecimal decimal;
@@ -258,7 +274,7 @@ public class ExpressionCalculation {
         String bufferForNumber = "";
         for (int i = 0; i < chars.length; i++) {
             //перебираем символы
-            if (!"".equals(chars[i]) && Pattern.matches("\\(|\\)|\\+|-|\\*|/|<", chars[i])){
+            if (!"".equals(chars[i]) && Pattern.matches("\\(|\\)|\\+|-|\\*|/|<|%", chars[i])){
                 //если текущий символ знак
 
                 if (!bufferForNumber.equals("")) {
